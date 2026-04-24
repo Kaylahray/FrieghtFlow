@@ -95,7 +95,9 @@ describe('WebhooksService', () => {
   });
 
   it('retries failed webhook deliveries up to three times with exponential backoff', async () => {
-    const delaySpy = jest.spyOn(service as any, 'delay').mockResolvedValue(undefined);
+    const delaySpy = jest
+      .spyOn(service as any, 'delay')
+      .mockResolvedValue(undefined);
     webhookRepo.find.mockResolvedValue([
       {
         id: 'webhook-1',
@@ -133,7 +135,9 @@ describe('WebhooksService', () => {
     (global.fetch as jest.Mock).mockResolvedValue({ ok: true, status: 200 });
 
     const shipment = makeShipment();
-    await service.deliverShipmentStatusChange(new ShipmentEvent(shipment, 'carrier-1'));
+    await service.deliverShipmentStatusChange(
+      new ShipmentEvent(shipment, 'carrier-1'),
+    );
 
     expect(webhookRepo.find).toHaveBeenCalledWith(
       expect.objectContaining({ where: { userId: shipment.shipperId } }),

@@ -61,12 +61,12 @@ const shipmentCreateTracker = (context: ExecutionContext): string => {
       {
         name: 'default',
         ttl: 60_000, // 1 minute window
-        limit: 60,   // 60 requests per minute (general)
+        limit: 60, // 60 requests per minute (general)
       },
       {
         name: 'auth',
         ttl: 60_000, // 1 minute window
-        limit: 10,   // 10 requests per minute (auth routes)
+        limit: 10, // 10 requests per minute (auth routes)
       },
       {
         name: 'shipmentCreate',

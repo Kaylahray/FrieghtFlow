@@ -9,7 +9,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -27,7 +32,9 @@ export class WebhooksController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles(UserRole.SHIPPER, UserRole.ADMIN)
-  @ApiOperation({ summary: 'Register a webhook URL for shipment status changes' })
+  @ApiOperation({
+    summary: 'Register a webhook URL for shipment status changes',
+  })
   @ApiResponse({ status: 201, description: 'Webhook created' })
   create(@CurrentUser() user: User, @Body() dto: CreateWebhookDto) {
     return this.webhooksService.create(user.id, dto);

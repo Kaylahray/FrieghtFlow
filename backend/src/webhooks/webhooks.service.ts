@@ -54,7 +54,9 @@ export class WebhooksService {
   }
 
   async remove(userId: string, webhookId: string): Promise<void> {
-    const webhook = await this.webhookRepo.findOne({ where: { id: webhookId } });
+    const webhook = await this.webhookRepo.findOne({
+      where: { id: webhookId },
+    });
 
     if (!webhook) {
       throw new NotFoundException(`Webhook ${webhookId} not found`);
@@ -118,7 +120,10 @@ export class WebhooksService {
         return;
       } catch (error) {
         if (attempt === 3) {
-          const message = error instanceof Error ? error.message : 'Unknown webhook delivery error';
+          const message =
+            error instanceof Error
+              ? error.message
+              : 'Unknown webhook delivery error';
           this.logger.warn(
             `Failed to deliver webhook ${webhook.id} after 3 attempts: ${message}`,
           );

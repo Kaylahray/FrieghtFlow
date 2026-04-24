@@ -7,7 +7,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Readable, Transform } from 'node:stream';
-import { Repository, FindOptionsWhere, ILike, SelectQueryBuilder } from 'typeorm';
+import {
+  Repository,
+  FindOptionsWhere,
+  ILike,
+  SelectQueryBuilder,
+} from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { v4 as uuidv4 } from 'uuid';
 import { Shipment } from './entities/shipment.entity';
@@ -66,6 +71,8 @@ interface ShipmentExportResult {
   contentType: string;
   fileName: string;
 }
+
+type ShipmentExportValue = string | number | Date | null | undefined;
 
 @Injectable()
 export class ShipmentsService {
@@ -203,7 +210,10 @@ export class ShipmentsService {
     );
     // Reload with relations for notification payload
     const full = await this.findOne(saved.id);
-    this.eventEmitter.emit(SHIPMENT_CREATED, new ShipmentEvent(full, shipperId));
+    this.eventEmitter.emit(
+      SHIPMENT_CREATED,
+      new ShipmentEvent(full, shipperId),
+    );
     return saved;
   }
 
@@ -299,7 +309,9 @@ export class ShipmentsService {
           ? this.createCsvExportStream(rowStream)
           : this.createJsonExportStream(rowStream),
       contentType:
-        format === 'csv' ? 'text/csv; charset=utf-8' : 'application/json; charset=utf-8',
+        format === 'csv'
+          ? 'text/csv; charset=utf-8'
+          : 'application/json; charset=utf-8',
       fileName: `shipments-${user.role === UserRole.ADMIN ? 'all' : user.id}-${timeLabel}.${format}`,
     };
   }
@@ -350,7 +362,10 @@ export class ShipmentsService {
       carrier.id,
     );
     const full = await this.findOne(shipmentId);
-    this.eventEmitter.emit(SHIPMENT_ACCEPTED, new ShipmentEvent(full, carrier.id));
+    this.eventEmitter.emit(
+      SHIPMENT_ACCEPTED,
+      new ShipmentEvent(full, carrier.id),
+    );
     return saved;
   }
 
@@ -377,7 +392,10 @@ export class ShipmentsService {
       carrier.id,
     );
     const full = await this.findOne(shipmentId);
-    this.eventEmitter.emit(SHIPMENT_IN_TRANSIT, new ShipmentEvent(full, carrier.id));
+    this.eventEmitter.emit(
+      SHIPMENT_IN_TRANSIT,
+      new ShipmentEvent(full, carrier.id),
+    );
     return saved;
   }
 
@@ -405,7 +423,10 @@ export class ShipmentsService {
       carrier.id,
     );
     const full = await this.findOne(shipmentId);
-    this.eventEmitter.emit(SHIPMENT_DELIVERED, new ShipmentEvent(full, carrier.id));
+    this.eventEmitter.emit(
+      SHIPMENT_DELIVERED,
+      new ShipmentEvent(full, carrier.id),
+    );
     return saved;
   }
 
@@ -430,7 +451,10 @@ export class ShipmentsService {
       shipper.id,
     );
     const full = await this.findOne(shipmentId);
-    this.eventEmitter.emit(SHIPMENT_COMPLETED, new ShipmentEvent(full, shipper.id));
+    this.eventEmitter.emit(
+      SHIPMENT_COMPLETED,
+      new ShipmentEvent(full, shipper.id),
+    );
     return saved;
   }
 
@@ -465,7 +489,10 @@ export class ShipmentsService {
       reason,
     );
     const full = await this.findOne(shipmentId);
-    this.eventEmitter.emit(SHIPMENT_CANCELLED, new ShipmentEvent(full, user.id, reason));
+    this.eventEmitter.emit(
+      SHIPMENT_CANCELLED,
+      new ShipmentEvent(full, user.id, reason),
+    );
     return saved;
   }
 
@@ -500,7 +527,10 @@ export class ShipmentsService {
       reason,
     );
     const full = await this.findOne(shipmentId);
-    this.eventEmitter.emit(SHIPMENT_DISPUTED, new ShipmentEvent(full, user.id, reason));
+    this.eventEmitter.emit(
+      SHIPMENT_DISPUTED,
+      new ShipmentEvent(full, user.id, reason),
+    );
     return saved;
   }
 
@@ -523,7 +553,10 @@ export class ShipmentsService {
       reason,
     );
     const full = await this.findOne(shipmentId);
-    this.eventEmitter.emit(SHIPMENT_DISPUTE_RESOLVED, new ShipmentEvent(full, admin.id, reason));
+    this.eventEmitter.emit(
+      SHIPMENT_DISPUTE_RESOLVED,
+      new ShipmentEvent(full, admin.id, reason),
+    );
     return saved;
   }
 
@@ -626,13 +659,16 @@ export class ShipmentsService {
   }
 
   private normalizeExportRow(row: ShipmentExportRow): Record<string, string> {
-    return this.exportColumns.reduce<Record<string, string>>((accumulator, column) => {
-      accumulator[column] = this.formatExportValue(row[column]);
-      return accumulator;
-    }, {});
+    return this.exportColumns.reduce<Record<string, string>>(
+      (accumulator, column) => {
+        accumulator[column] = this.formatExportValue(row[column]);
+        return accumulator;
+      },
+      {},
+    );
   }
 
-  private formatExportValue(value: unknown): string {
+  private formatExportValue(value: ShipmentExportValue): string {
     if (value === null || value === undefined) {
       return '';
     }
