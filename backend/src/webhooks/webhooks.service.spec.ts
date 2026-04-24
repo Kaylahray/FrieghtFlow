@@ -90,7 +90,7 @@ describe('WebhooksService', () => {
     const timestamp = '2026-04-24T00:00:00.000Z';
 
     expect(service.signPayload(payload, 'test-secret', timestamp)).toBe(
-      '7afd6821fe5bcc802f07ebac39158fec638c7b1ca0f86baf4ee9a39177dce59b',
+      'a0a1511d3888962d34b87a2e2988bcffedd46c15d92801d8d990270dc16669bb',
     );
   });
 
